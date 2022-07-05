@@ -3,9 +3,10 @@ package com.example.breakingnewsapp.ui.fragment
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.breakingnewsapp.R
 import com.example.breakingnewsapp.ui.NewsActivity
@@ -15,8 +16,9 @@ import com.example.breakingnewsapp.ui.utils.Resource
 import kotlinx.android.synthetic.main.fragment_breaking_news.*
 
 class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
-    lateinit var viewModel: NewsViewModel
+//    private val viewModel: NewsViewModel by activityViewModels()
     lateinit var newsAdapter: NewsAdapter
+    lateinit var viewModel: NewsViewModel
 
     val TAG = "BreakingNewsFragment"
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,6 +27,17 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
 
         setUpRecyclerView()
 
+
+        newsAdapter.setOnItemClickListener{
+
+            val bundle = Bundle().apply {
+                putSerializable("article",it)
+            }
+            findNavController().navigate(
+                R.id.action_breakingNewsFragment_to_articleFragment,
+                bundle
+            )
+        }
         viewModel.breakingNews.observe(viewLifecycleOwner, Observer { response ->
             when (response) {
                 is Resource.Success -> {
@@ -59,7 +72,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
         newsAdapter = NewsAdapter()
         rvBreakingNews.apply {
             adapter = newsAdapter
-            layoutManager = LinearLayoutManager(requireActivity())
+            layoutManager = LinearLayoutManager(activity)
         }
     }
 }
